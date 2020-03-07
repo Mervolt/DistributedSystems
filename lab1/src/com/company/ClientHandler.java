@@ -46,9 +46,11 @@ public class ClientHandler implements Runnable {
     private void sendMessageToConnectedClients(String receivedMessage){
         for(ClientHandler handler: Server.clients){
             try {
-                Socket socket = handler.getSocket();
-                PrintWriter externalWriter = new PrintWriter(socket.getOutputStream(), true);
-                externalWriter.println(username + ": " + receivedMessage);
+                if(!handler.getUsername().equals(this.username)) {
+                    Socket socket = handler.getSocket();
+                    PrintWriter externalWriter = new PrintWriter(socket.getOutputStream(), true);
+                    externalWriter.println(username + ": " + receivedMessage);
+                }
             } catch (IOException e) {
                 handleIOException(e);
             }

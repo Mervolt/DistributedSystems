@@ -21,7 +21,7 @@ public class Server {
                 Socket clientSocket = serverSocket.accept();
                 PrintWriter writer = new PrintWriter(clientSocket.getOutputStream(), true);
                 BufferedReader reader = new BufferedReader(new InputStreamReader(clientSocket.getInputStream()));
-                ClientHandler clientHandler = new ClientHandler("Client " + client_id, writer, reader, clientSocket);
+                ClientHandler clientHandler = new ClientHandler("User " + client_id, writer, reader, clientSocket);
                 Thread thread = new Thread(clientHandler);
                 client_id++;
                 client_count++;
