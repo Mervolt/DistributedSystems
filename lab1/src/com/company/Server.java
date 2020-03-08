@@ -9,6 +9,8 @@ import java.net.ServerSocket;
 import java.net.Socket;
 import java.util.ArrayList;
 import java.util.List;
+import java.util.concurrent.ExecutorService;
+import java.util.concurrent.Executors;
 
 public class Server {
     public static final String ANSI_RESET = "\u001B[0m";
@@ -25,11 +27,12 @@ public class Server {
         ServerSocket serverSocket = null;
         DatagramSocket udpSocket;
         try {
+            ExecutorService pool = Executors.newFixedThreadPool(20);
             serverSocket = new ServerSocket(12345);
             udpSocket = new DatagramSocket(12345);
             ClientHandlerUdp clientHandlerUdp = new ClientHandlerUdp(udpSocket);
             Thread threadUdp = new Thread(clientHandlerUdp);
-            threadUdp.start();
+            pool.execute(threadUdp);
             while (true) {
                 String username = "User " + client_id;
                 Socket clientSocket = serverSocket.accept();
@@ -40,7 +43,7 @@ public class Server {
                 client_id++;
                 client_count++;
                 clients.add(clientHandler);
-                thread.start();
+                pool.execute(thread);
             }
         } catch (IOException e) {
             e.printStackTrace();
