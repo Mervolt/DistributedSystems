@@ -33,7 +33,7 @@ public class ClientHandler implements Runnable {
         while(running){
             try {
                 String receivedMessage = reader.readLine();
-                System.out.println("Server message logs:" + receivedMessage);
+                System.out.println(Server.ANSI_GREEN + "Server message logs:" + receivedMessage + Server.ANSI_RESET);
                 sendMessageToConnectedClients(receivedMessage);
             } catch (SocketException se){
                 running = false;
@@ -60,7 +60,7 @@ public class ClientHandler implements Runnable {
     private void handleSocketException(SocketException se){
         Server.clients.remove(this);
         Server.client_count--;
-        String disconnectedClient = "CLIENT DISCONNECTED: " + this.getUsername();
+        String disconnectedClient = Server.ANSI_RED + "CLIENT DISCONNECTED: " + this.getUsername() + Server.ANSI_RESET;
         for(ClientHandler handler: Server.clients){
             try {
                 Socket socket = handler.getSocket();
@@ -74,7 +74,7 @@ public class ClientHandler implements Runnable {
 
     private void handleIOException(IOException e){
         e.printStackTrace();
-        System.out.println("SERVER ERROR");
+        System.out.println(Server.ANSI_RED + "SERVER ERROR" + Server.ANSI_RESET);
     }
 
 }
