@@ -20,6 +20,7 @@ public class ClientReceiver implements Runnable {
             }
         }catch(SocketException se){
             System.out.println(Server.ANSI_RED + "SERVER SHUTDOWN!!!" + Server.ANSI_RESET);
+            System.exit(2);
         } catch (IOException e) {
             e.printStackTrace();
         }

@@ -57,24 +57,15 @@ public class ClientSender implements  Runnable {
     @Override
     public void run() {
         try {
-            MulticastSocket multicastSocket = new MulticastSocket(1234);
-            InetAddress group = InetAddress.getByName("225.0.0.0");
             socket.bind(tcpSocket.getLocalSocketAddress());
+            System.out.println(Server.ANSI_YELLOW + "Welcome to server" + Server.ANSI_RESET);
         while(true) {
             Scanner scanner = new Scanner(System.in);
-            System.out.println(Server.ANSI_YELLOW + "Please enter your message" + Server.ANSI_RESET);
             String message = scanner.nextLine();
             if(message.equals("U")) {
                 sendUdpMessage();
             }
-            else if(message.equals("M")){
-                String multiMessage = scanner.nextLine();
-                DatagramPacket sendPacket = new DatagramPacket(multiMessage.getBytes(), multiMessage.getBytes().length,
-                        group, 1234);
-                multicastSocket.send(sendPacket);
-            }
             else if(message.equals("logout")){
-                multicastSocket.close();
                 socket.close();
                 tcpSocket.close();
                 System.exit(0);
