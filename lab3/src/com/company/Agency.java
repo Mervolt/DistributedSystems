@@ -9,11 +9,26 @@ import java.io.BufferedReader;
 import java.io.IOException;
 import java.io.InputStreamReader;
 import java.util.Scanner;
+import java.util.concurrent.ExecutorService;
+import java.util.concurrent.Executors;
 import java.util.concurrent.TimeoutException;
 
 public class Agency {
+    public static String ACK_EXCHANGE = "ackExchange";
+    String name;
+
+    public Agency(String name) {
+        this.name = name;
+    }
 
     public static void main(String[] args) throws IOException, TimeoutException {
+
+        System.out.println("AGENCY");
+        BufferedReader reader = new BufferedReader(new InputStreamReader(System.in));
+        String agencyName = reader.readLine();
+        Agency agency = new Agency(agencyName);
+
+        System.out.println(agency.name);
         // connection & channel
         ConnectionFactory factory = new ConnectionFactory();
         factory.setHost("localhost");
@@ -21,10 +36,17 @@ public class Agency {
         Channel channel = connection.createChannel();
 
         // exchange
-        channel.exchangeDeclare(Transporter.ORDER_EXCHANGE, BuiltinExchangeType.DIRECT);
+        channel.exchangeDeclare(Transporter.ORDER_EXCHANGE, BuiltinExchangeType.TOPIC);
+        channel.exchangeDeclare(ACK_EXCHANGE, BuiltinExchangeType.TOPIC);
+        channel.exchangeDeclare(Administrator.ADMIN_EXCHANGE, BuiltinExchangeType.TOPIC);
+
+        ExecutorService pool = Executors.newFixedThreadPool(1);
+        AgencyAckReceiver ackReceiver = new AgencyAckReceiver(agency.name, channel);
+        Thread receiver = new Thread(ackReceiver);
+        pool.execute(receiver);
 
 
-        //System.out.println("Agency");
+
 
         while(true) {
             BufferedReader br = new BufferedReader(new InputStreamReader(System.in));
@@ -32,7 +54,22 @@ public class Agency {
 
             if(message.equals("exit"))
                 break;
-            channel.basicPublish(Transporter.ORDER_EXCHANGE, message, null, message.getBytes("UTF-8"));
+            String task;
+            switch (message) {
+                case "C":
+                    task = "Cargo";
+                    break;
+                case "P":
+                    task = "People";
+                    break;
+                case "S":
+                    task = "Satellite";
+                    break;
+                default:
+                    throw new IllegalArgumentException("Wrong task");
+            }
+            message = message + '-' + agency.name;
+            channel.basicPublish(Transporter.ORDER_EXCHANGE, "order." + task, null, message.getBytes("UTF-8"));
             System.out.println("Sent: " + message);
         }
 
