@@ -43,6 +43,5 @@ public class AgencyAckReceiver implements Runnable {
         } catch (IOException e) {
             e.printStackTrace();
         }
-
     }
 }

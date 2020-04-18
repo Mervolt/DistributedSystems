@@ -15,6 +15,7 @@ public class Transporter {
     boolean satellitePlacing = false;
 
     public static void main(String[] args) throws IOException, TimeoutException {
+        System.out.println("TRANSPORTER");
         Transporter transporter = new Transporter();
         transporter.declareResponsibilites();
 
@@ -28,7 +29,6 @@ public class Transporter {
         channel.exchangeDeclare(ORDER_EXCHANGE, BuiltinExchangeType.TOPIC);
         channel.exchangeDeclare(Agency.ACK_EXCHANGE, BuiltinExchangeType.TOPIC);
         channel.exchangeDeclare(Administrator.ADMIN_EXCHANGE, BuiltinExchangeType.TOPIC);
-
 
         // queue & bind
         String adminQueueName = channel.queueDeclare().getQueue();
@@ -75,13 +75,8 @@ public class Transporter {
             }
         };
 
-
-
-
         // start listening
         System.out.println("Waiting for messages...");
-        //channel.basicConsume(QUEUE_NAME, true, consumer);
-
 
         channel.basicConsume(adminQueueName, false, adminInfoConsumer);
         if(transporter.routingKey.contains("C"))
