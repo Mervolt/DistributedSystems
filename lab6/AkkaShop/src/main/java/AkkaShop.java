@@ -1,3 +1,5 @@
+import actors.Client;
+import actors.Server;
 import akka.actor.ActorRef;
 import akka.actor.ActorSystem;
 import akka.actor.Props;
@@ -7,14 +9,16 @@ import java.io.IOException;
 import java.io.InputStreamReader;
 import java.util.Arrays;
 import java.util.List;
+import java.util.concurrent.ConcurrentHashMap;
+import java.util.concurrent.ConcurrentMap;
 
 public class AkkaShop {
-    static final ActorSystem system = ActorSystem.create("local_system");
-    static final ActorRef server = system.actorOf(Props.create(Server.class), "server");
+    final ActorSystem system = ActorSystem.create("local_system");
+    final ActorRef server = system.actorOf(Props.create(Server.class), "server");
     private int clientCounter = 0;
+    private ConcurrentMap<String, ActorRef> actors = new ConcurrentHashMap<>();
+
     public static void main(String[] args) {
-
-
         AkkaShop shop = new AkkaShop();
 
         boolean running = true;
@@ -36,7 +40,9 @@ public class AkkaShop {
     private void askForProducts(String products) {
         List<String> productList = splitProducts(products);
         for(String product : productList){
-            ActorRef client = system.actorOf(Props.create(Client.class), getClientIdAndIncrementCounter());
+            String clientId = getClientIdAndIncrementCounter();
+            ActorRef client = system.actorOf(Props.create(Client.class, server, product), clientId);
+            actors.put(clientId, client);
             client.tell(product, null);
         }
     }

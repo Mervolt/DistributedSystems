@@ -1,5 +1,13 @@
 package model;
 
 public class Price {
-    public Integer quantity;
+    private Integer quantity;
+
+    public Price(Integer quantity) {
+        this.quantity = quantity;
+    }
+
+    public Integer getQuantity() {
+        return quantity;
+    }
 }
